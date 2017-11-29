@@ -1,0 +1,13 @@
+{
+  "name": "MeshNetApi",
+  "description": "The API for MeshNet",
+  "author": "Jetse Verschuren",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meshnet/api.git"
+  },
+  "dependencies": {
+    "ws": "*"
+  }
+}
