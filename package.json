@@ -1,7 +1,7 @@
 {
   "name": "MeshNetApi",
   "description": "The API for MeshNet",
-  "author": "Jetse Verschuren",
+  "author": "Jetse Verschuren and Andrew Bliss",
   "version": "0.0.1",
   "repository": {
     "type": "git",
