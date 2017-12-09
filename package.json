@@ -8,6 +8,6 @@
     "url": "git+https://github.com/meshnet/api.git"
   },
   "dependencies": {
-    "ws": "*"
+    "ws": "^3.3.2"
   }
 }
