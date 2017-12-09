@@ -3,7 +3,7 @@ const API = require('./api.js');
 const server = new API.Server();
 
 server.register('send', ['message'], function received(args, response) {
-  console.log("Sending \"%s\"", args['message']);
+  console.log("Sending \"%s\" to \"%s\"", args['message'], args['address']);
   response['data']['message'] = args['message'];
   response['success'] = true;
 });
