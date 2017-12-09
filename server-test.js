@@ -15,9 +15,9 @@ server.register('battery', [], function received(args, response) {
   // This bit just to show that you can pass any extra arguments as long as you also pass the required ones, and they can be accessed here.
   // Just wanted to show it since it isnt an immediately obvious feature.
   for (var arg in args) {
-	if (args.hasOwnProperty(arg)) {
-	  response['data'][arg] = args[arg];
-	}
+    if (args.hasOwnProperty(arg)) {
+      response['data'][arg] = args[arg];
+    }
   }
   
   response['success'] = true;
