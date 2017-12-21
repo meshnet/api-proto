@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/meshnet/api.git"
+    "url": "git+https://github.com/meshnet/api-proto.git"
   },
   "dependencies": {
     "ws": "^3.3.2"
