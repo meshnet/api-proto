@@ -7,18 +7,24 @@ class Server {
       this.connection = response;
       if (request.method == 'POST') {
         var body = '';
-        request.on('data', function (data) {
+        request.on('data', function(data) {
           body += data;
         });
-        request.on('end', (function () {
+        request.on('end', (function() {
           this._incoming(body);
         }).bind(this));
       } else {
-        this._send(response, {'success': false, 'error': 'Invalid http request.', 'data': {}});
+        this._send(response, {
+          'success': false,
+          'error': 'Invalid http request.',
+          'data': {}
+        });
       }
     }
     const server = http.createServer(requestHandler)
-    this.wss = new WebSocket.Server({ server });
+    this.wss = new WebSocket.Server({
+      server
+    });
     this.version = "0.1"; // TODO implement
     this.actions = {};
 
@@ -37,8 +43,12 @@ class Server {
     var connection = this.connection;
     try {
       var data = JSON.parse(message);
-    } catch(e) {
-      this._send(connection, {'success': false, 'error': 'Invalid data format.', 'data': {}});
+    } catch (e) {
+      this._send(connection, {
+        'success': false,
+        'error': 'Invalid data format.',
+        'data': {}
+      });
       return;
     }
 
@@ -46,67 +56,90 @@ class Server {
     if (action !== undefined) {
       var args = data['data'];
       if (args !== undefined && Object.keys(args).length >= action[0].length) {
-        action[0].forEach(function (arg) {
+        action[0].forEach(function(arg) {
           if (!(args.hasOwnProperty(arg))) {
-            this._send(connection, {'success': false, 'error': 'Insufficient arguments.', 'data': {}});
+            this._send(connection, {
+              'success': false,
+              'error': 'Insufficient arguments.',
+              'data': {}
+            });
             return;
           }
         });
 
         var passArgs = args;
-        var response = {'success': true, 'error': '', 'data': {}};
+        var response = {
+          'success': true,
+          'error': '',
+          'data': {}
+        };
         action[1](passArgs, response);
 
         if (response['success'] === undefined || !(response['success'])) {
-          this._send(connection, {'success': false, 'error': (typeof(response['error']) === 'string' ? response['error'] : ''), 'data': {}});
+          this._send(connection, {
+            'success': false,
+            'error': (typeof(response['error']) === 'string' ? response['error'] : ''),
+            'data': {}
+          });
           return;
         }
 
-        this._send(connection, {'success': true, 'error': '', 'data': (typeof(response['data']) === 'object' ? response['data'] : {})});
+        this._send(connection, {
+          'success': true,
+          'error': '',
+          'data': (typeof(response['data']) === 'object' ? response['data'] : {})
+        });
         return;
       } else {
-        this._send(connection, {'success': false, 'error': 'Insufficient arguments.', 'data': {}});
+        this._send(connection, {
+          'success': false,
+          'error': 'Insufficient arguments.',
+          'data': {}
+        });
         return;
       }
     } else {
-        this._send(connection, {'success': false, 'error': 'Action not defined.', 'data': {}});
-        return;
+      this._send(connection, {
+        'success': false,
+        'error': 'Action not defined.',
+        'data': {}
+      });
+      return;
     }
   }
 
   _send(connection, data) {
-      if (typeof(data) === 'string') {
-        try {
-          data = JSON.parse(data);
-        } catch(e) {
-          return false;
-        }
-      }
-
-      if (data['success'] === undefined || data['error'] === undefined || data['data'] === undefined) {
-        return false;
-      }
-
+    if (typeof(data) === 'string') {
       try {
-        if(connection.constructor.name == "WebSocket"){
-          //WebSocket request
-          connection.send(JSON.stringify(data));
-        }
-        else {
-          //Browser request
-          connection.end(JSON.stringify(data));
-        }
-      } catch(e) {
+        data = JSON.parse(data);
+      } catch (e) {
         return false;
       }
-      return true;
+    }
+
+    if (data['success'] === undefined || data['error'] === undefined || data['data'] === undefined) {
+      return false;
+    }
+
+    try {
+      if (connection.constructor.name == "WebSocket") {
+        //WebSocket request
+        connection.send(JSON.stringify(data));
+      } else {
+        //Browser request
+        connection.end(JSON.stringify(data));
+      }
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
 
   register(action, args, cb) {
     if (typeof(args) !== 'object' || typeof(cb) !== 'function') {
       return false;
     }
-    switch(typeof('action')) {
+    switch (typeof('action')) {
       case 'string':
         break;
       case 'number':
@@ -118,7 +151,9 @@ class Server {
         break;
     }
 
-    this.actions[action] = [[], cb];
+    this.actions[action] = [
+      [], cb
+    ];
     args.forEach((function(arg) {
       if (typeof(arg) === 'string') {
         this.actions[action][0].push(arg);
@@ -131,6 +166,21 @@ class Server {
   unregister(action) {
     this.actions[action] = undefined;
     return true;
+  }
+
+  broadcast(data) {
+    if (typeof(data) === 'object') {
+      try {
+        data = JSON.stringify(data);
+      } catch (e) {
+        return false;
+      }
+    }
+    this.wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    });
   }
 }
 
