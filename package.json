@@ -1,13 +1,13 @@
 {
   "name": "MeshNetApi",
   "description": "The API for MeshNet",
-  "author": "Jetse Verschuren",
+  "contributors": [{"name": "Jetse Verschuren"}, {"name": "Andrew Bliss"}],
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/meshnet/api.git"
+    "url": "git+https://github.com/meshnet/api-proto.git"
   },
   "dependencies": {
-    "ws": "*"
+    "ws": "^3.3.2"
   }
 }
